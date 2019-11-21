@@ -1,6 +1,0 @@
-{
-  "bot": {
-    "secret": "notsosecret",
-    "command": "deploy_bot.sh"
-  }
-}

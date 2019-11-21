@@ -1,4 +1,4 @@
 #!/bin/sh
-sleep 1800 # wait for dockerhub to build new image
-docker-compose down -rmi vldcbot
-docker-compose up -d vldcbot
+docker-compose -p devbot -f docker-compose.dev.yml pull
+docker-compose -p devbot -f docker-compose.dev.yml down
+docker-compose -p devbot -f docker-compose.dev.yml up -d

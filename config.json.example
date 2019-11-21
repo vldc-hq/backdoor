@@ -1,0 +1,10 @@
+{
+  "bot": {
+    "secret": "notsosecret",
+    "command": "deploy_bot.sh"
+  },
+  "bot-prod": {
+    "secret": "verysecret",
+    "command": "deploy_bot_prod.sh"
+  }
+}

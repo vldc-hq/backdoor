@@ -1,3 +1,7 @@
 backdoor
+ci
 server.key
+config.json
+dev.env
+prod.env
 

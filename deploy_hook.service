@@ -1,0 +1,10 @@
+[Unit]
+Description=Deploy hook handlers
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/bin/run_deploy_hook.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
