@@ -1,7 +1,5 @@
 # Backdoor
 
-*Do not use it! I have warned you :)*
-
 It is a very simple service meant to be used as a web hook for deploying something via web hooks from CI in a *TRUSTED ENVIRONMENT*.
 It has only basic security built in, so it should not be used in anything you are not willing to sacrifice.
 
@@ -33,6 +31,3 @@ When run service will read this config and and begin listening on port 8080 for 
 If it matches, then the configured script will be run. It should exist in `./scripts` directory (relative to service working dir) and be executable.
 If script's return code is zero, service will return HTTP code 200, otherwise code will be 500.
 
-## Final warning
-
-There is a reason I called this thing a backdoor. There are many ways you can be pwned when using this thing. The most obvious one - everybody who has write access to repository that is being deployed can put in malicious code there and trigger a deployment using preconfigured CI webhook.
