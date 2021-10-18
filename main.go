@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 type deploymentConfig struct {
@@ -64,7 +67,7 @@ func unauthorized(w http.ResponseWriter, addr string) {
 	}
 }
 
-func runScript(name string) {
+func runScript(name string, w http.ResponseWriter) error {
 	path := fmt.Sprintf("./scripts/%s", name)
 	log.Printf("running %s", path)
 	cmd := exec.Command(
@@ -72,11 +75,39 @@ func runScript(name string) {
 		"-c",
 		path,
 	)
-	out, err := cmd.CombinedOutput()
+
+	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("could not get stderr pipe: %w", err)
 	}
-	log.Println(string(out))
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("could not get stdout pipe: %w", err)
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		merged := io.MultiReader(stderr, stdout)
+		scanner := bufio.NewScanner(merged)
+
+		for scanner.Scan() {
+			b := scanner.Bytes()
+			log.Print(b)
+
+			if _, err = w.Write(b); err != nil {
+				log.Printf("failed to read cmd: %v", err)
+				return
+			}
+		}
+	}()
+
+	wg.Wait()
+	return err
 }
 
 // DeployHandler runs some script to upgrade some service
@@ -98,6 +129,7 @@ func DeployHandler(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, r.RemoteAddr)
 		return
 	}
+
 	secrets, ok := values["secret"]
 	if !ok || len(secrets) != 1 {
 		badRequest(w, r.RemoteAddr)
@@ -112,7 +144,14 @@ func DeployHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write([]byte("deploying...")); err != nil {
 		log.Printf("Failed to write response: %v", err)
 	}
-	go runScript(cfg.Command)
+
+	if err := runScript(cfg.Command, w); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("deploy failed\n")) //nolint:errcheck
+		return
+	}
+
+	w.Write([]byte("done\n")) //nolint:errcheck
 }
 
 func main() {
