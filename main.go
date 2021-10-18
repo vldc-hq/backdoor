@@ -67,16 +67,18 @@ func unauthorized(w http.ResponseWriter, addr string) {
 func runScript(name string) error {
 	path := fmt.Sprintf("./scripts/%s", name)
 	log.Printf("running %s", path)
+
 	cmd := exec.Command(
 		"bash",
 		"-c",
 		path,
 	)
+
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Println(err)
 		return err
 	}
+
 	log.Println(string(out))
 
 	return nil
@@ -116,14 +118,18 @@ func DeployHandler(w http.ResponseWriter, r *http.Request) {
 	if values.Get("sync") == "true" {
 		if err = runScript(cfg.Command); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			if _, err := w.Write([]byte("deploying is failed")); err != nil {
+			log.Printf("failed to run script: %v", err)
+
+			if _, err := w.Write([]byte("deployment failed")); err != nil {
 				log.Printf("Failed to write response: %v", err)
 			}
 		}
 
-		if _, err := w.Write([]byte("deploying is done")); err != nil {
+		log.Println("deployment succeed")
+		if _, err := w.Write([]byte("deployment succeed")); err != nil {
 			log.Printf("Failed to write response: %v", err)
 		}
+
 		return
 	}
 
@@ -131,9 +137,10 @@ func DeployHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write([]byte("deploying...")); err != nil {
 		log.Printf("Failed to write response: %v", err)
 	}
+
 	go func() {
 		if err = runScript(cfg.Command); err != nil {
-			log.Printf("can't run script: %v", err)
+			log.Printf("failed to run script: %v", err)
 		}
 	}()
 }
