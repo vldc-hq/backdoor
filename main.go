@@ -123,6 +123,8 @@ func DeployHandler(w http.ResponseWriter, r *http.Request) {
 			if _, err := w.Write([]byte("deployment failed")); err != nil {
 				log.Printf("Failed to write response: %v", err)
 			}
+
+			return
 		}
 
 		log.Println("deployment succeed")
