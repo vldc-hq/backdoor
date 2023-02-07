@@ -15,7 +15,7 @@ Which *hopefully* pulls and deploys the newly built service.
 
 ## Configuration
 
-You need to configure at least one deployment for service to be usable. Deployment is specified in configuration file as an object with a name and two properties (script name to be executed and a secret to authorize deployment).
+You need to configure at least one deployment for a service to be usable. Deployment is specified in configuration file as an object with a name and two properties (script name to be executed and a secret to authorize deployment).
 
 Here is an example of a `config.json` file:
 
