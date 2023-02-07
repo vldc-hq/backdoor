@@ -4,6 +4,7 @@ It is a very simple service meant to be used as a web hook for deploying somethi
 It has only basic security built in, so it should not be used in anything you are not willing to sacrifice.
 
 ## Use case
+
 You have CI job that builds image "username/service" and pushes it to some registry. After push is done, CI fires up curl like this:
 
 ```shell
