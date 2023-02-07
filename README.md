@@ -10,7 +10,7 @@ You have CI job that builds image "username/service" and pushes it to some regis
 curl https://your.url/deploy/deploymentname?secret=NotSoSecretAtAll
 ```
 
-Which *hopefully* pulls and deploys your newly built service.
+Which *hopefully* pulls and deploys the newly built service.
 
 ## Configuration
 
