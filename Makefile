@@ -1,3 +1,5 @@
+.PHONY: ci lint fmt
+
 ci: main.go
 	go build -o ci .
 
